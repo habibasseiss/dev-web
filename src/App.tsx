@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import { CircleCheckBigIcon, Trash2Icon } from "lucide-react"
+import { getTodos } from "./api";
 
 // A interface em que objetos do tipo Item respeitarão
 interface Item {
-  titulo: string,
-  concluido: boolean,
+  _id: string,
+  name: string,
+  timestamp: number,
+  done: boolean,
 }
 
 function Menu() {
@@ -27,9 +30,9 @@ function TodoItem({
     concluir: () => void,
   }) {
   return (
-    <div className={`flex items-center justify-between p-2 rounded-md border bg-slate-50 ${item.concluido ? 'opacity-50' : ''}`}>
-      <div className={item.concluido ? 'line-through' : ''}>
-        {item.titulo}
+    <div className={`flex items-center justify-between p-2 rounded-md border bg-slate-50 ${item.done ? 'opacity-50' : ''}`}>
+      <div className={item.done ? 'line-through' : ''}>
+        {item.name}
       </div>
       <div className="space-x-1">
         <Button variant="outline" size="icon" onClick={concluir}>
@@ -46,6 +49,13 @@ function TodoItem({
 function Conteudo() {
   const [itens, setItens] = useState([] as Item[]); // um array de itens
 
+  useEffect(() => {
+    // chamar a api
+    getTodos().then(result => {
+      setItens(result);
+    })
+  }, []);
+
   function submeterFormulario(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -56,8 +66,10 @@ function Conteudo() {
     if (titulo) {
       // instanciação de um novo objeto que respeita a interface Item
       const item: Item = {
-        titulo: titulo,
-        concluido: false,
+        _id: '123',
+        name: titulo,
+        timestamp: Date.now(),
+        done: false,
       };
 
       // setar os itens do estado (setItens)
@@ -76,7 +88,7 @@ function Conteudo() {
 
   function concluir(index: number) {
     const item = itens[index];
-    item.concluido = true; // modificando a propriedade concluido
+    item.done = true; // modificando a propriedade done
 
     setItens([...itens]);
   }
