@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// url para fazer login
 const API_URL = "https://ifms-todo.fly.dev/api/auth/token";
 
 export const authService = {
@@ -9,7 +10,10 @@ export const authService = {
     password: string,
   ): Promise<string> {
     try {
-      const response = await axios.post(API_URL, { username, password });
+      const response = await axios.post(API_URL, {
+        "username": username,
+        "password": password
+      });
       const token = response.data.token;
 
       // Armazenar o token no localStorage

@@ -3,6 +3,7 @@ import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import { CircleCheckBigIcon, Trash2Icon } from "lucide-react"
 import { getTodos } from "./api";
+import { authService } from "./api/authService";
 
 // A interface em que objetos do tipo Item respeitarão
 interface Item {
@@ -125,13 +126,46 @@ function Rodape() {
 }
 
 function App() {
-  return (
-    <div className="m-4 space-y-6">
-      <Menu />
-      <Conteudo />
-      <Rodape />
-    </div>
-  );
+  const [logado, setLogado] = useState(false);
+
+  // se o state estiver verdadeiro ou o localStorage tiver o token
+  if (logado || authService.getToken()) {
+    // mostrar a aplicação normalmente
+    return (
+      <div className="m-4 space-y-6">
+        <Menu />
+        <Conteudo />
+        <Rodape />
+      </div>
+    );
+  } else {
+    // mostrar o formulário de login
+
+    function submeterFormulario(e: React.FormEvent<HTMLFormElement>) {
+      e.preventDefault();
+  
+      // pegar os valores digitado nos inputs
+      const form = e.target as HTMLElement;
+      const usuario = (form.querySelector('input[type=text]') as HTMLInputElement)?.value;
+      const senha = (form.querySelector('input[type=password]') as HTMLInputElement)?.value;
+
+      authService.login(usuario, senha).then((result) => {
+        setLogado(true);
+      });
+    }
+
+    return (
+      <div>
+        <form onSubmit={(e) => submeterFormulario(e)}>
+          <div className="p-4 space-y-2">
+            <Input type="text" placeholder="Nome de usuário" />
+            <Input type="password" placeholder="Senha" />
+            <Button type="submit">Autenticar</Button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 }
 
 export default App
