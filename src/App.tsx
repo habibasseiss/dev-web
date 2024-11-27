@@ -2,16 +2,9 @@ import { useEffect, useState } from "react";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import { CircleCheckBigIcon, Trash2Icon } from "lucide-react"
-import { getTodos } from "./api";
 import { authService } from "./api/authService";
-
-// A interface em que objetos do tipo Item respeitarão
-interface Item {
-  _id: string,
-  name: string,
-  timestamp: number,
-  done: boolean,
-}
+import { Item } from "./types/Item";
+import { todoRepository } from "./repositories/todoRepository";
 
 function Menu() {
   return (
@@ -52,7 +45,7 @@ function Conteudo() {
 
   useEffect(() => {
     // chamar a api
-    getTodos().then(result => {
+    todoRepository.getAll().then(result => {
       setItens(result);
     })
   }, []);
@@ -65,33 +58,35 @@ function Conteudo() {
     const titulo = form.querySelector('input')?.value;
 
     if (titulo) {
-      // instanciação de um novo objeto que respeita a interface Item
-      const item: Item = {
-        _id: '123',
-        name: titulo,
-        timestamp: Date.now(),
-        done: false,
-      };
+      todoRepository.add(titulo).then((item) => {
+        // setar os itens do estado (setItens)
+        setItens([item, ...itens]);
 
-      // setar os itens do estado (setItens)
-      setItens([...itens, item]);
-
-      // limpar o input após inserção
-      form.querySelector('input')!.value = '';
+        // limpar o input após inserção
+        form.querySelector('input')!.value = '';
+      });
     }
   }
 
   function remover(index: number) {
+    const item = itens[index];
+    
     if (confirm("Tem certeza que deseja remover?")) {
-      setItens(itens.filter((_, i) => i !== index));
+      todoRepository.remove(item._id).then((removido) => {
+        if (removido) {
+          setItens(itens.filter((_, i) => i !== index));
+        }
+      })
     }
   }
 
   function concluir(index: number) {
     const item = itens[index];
-    item.done = true; // modificando a propriedade done
-
-    setItens([...itens]);
+    
+    todoRepository.markAsDone(item._id, !item.done).then((item) => {
+      itens[index] = item;
+      setItens([...itens]); // forçar a renderização do componente
+    });
   }
 
   return (
@@ -140,7 +135,6 @@ function App() {
     );
   } else {
     // mostrar o formulário de login
-
     function submeterFormulario(e: React.FormEvent<HTMLFormElement>) {
       e.preventDefault();
   

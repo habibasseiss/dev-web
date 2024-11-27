@@ -15,4 +15,14 @@ axiosInstance.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
+// Adicionar um interceptor para lidar com respostas
+axiosInstance.interceptors.response.use((response) => {
+  return response;
+}, (error) => {
+  if (error.response && (error.response.status === 401 || error.response.status === 500)) {
+    authService.logout(); // remover o token do localStorage
+  }
+  return Promise.reject(error);
+});
+
 export default axiosInstance;
