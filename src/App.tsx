@@ -5,14 +5,7 @@ import { CircleCheckBigIcon, Trash2Icon } from "lucide-react"
 import { authService } from "./api/authService";
 import { Item } from "./types/Item";
 import { todoRepository } from "./repositories/todoRepository";
-
-function Menu() {
-  return (
-    <div className="py-2 border-b">
-      Lista de Tarefas
-    </div>
-  );
-}
+import { NavLink } from "react-router";
 
 function TodoItem({
     item,
@@ -112,14 +105,6 @@ function Conteudo() {
   );
 }
 
-function Rodape() {
-  return (
-    <div className="py-2 border-t">
-      TADS &copy; 2024
-    </div>
-  );
-}
-
 function App() {
   const [logado, setLogado] = useState(false);
 
@@ -127,11 +112,7 @@ function App() {
   if (logado || authService.getToken()) {
     // mostrar a aplicação normalmente
     return (
-      <div className="m-4 space-y-6">
-        <Menu />
-        <Conteudo />
-        <Rodape />
-      </div>
+      <Conteudo />
     );
   } else {
     // mostrar o formulário de login
