@@ -5,7 +5,6 @@ import { CircleCheckBigIcon, Trash2Icon } from "lucide-react"
 import { authService } from "./api/authService";
 import { Item } from "./types/Item";
 import { todoRepository } from "./repositories/todoRepository";
-import { NavLink } from "react-router";
 
 function TodoItem({
     item,
@@ -124,7 +123,7 @@ function App() {
       const usuario = (form.querySelector('input[type=text]') as HTMLInputElement)?.value;
       const senha = (form.querySelector('input[type=password]') as HTMLInputElement)?.value;
 
-      authService.login(usuario, senha).then((result) => {
+      authService.login(usuario, senha).then(() => {
         setLogado(true);
       });
     }
